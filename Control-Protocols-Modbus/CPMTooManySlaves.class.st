@@ -1,5 +1,5 @@
 Class {
 	#name : #CPMTooManySlaves,
-	#superclass : #Exception,
+	#superclass : #Error,
 	#category : #'Control-Protocols-Modbus-Exceptions'
 }

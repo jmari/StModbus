@@ -3,7 +3,6 @@ Class {
 	#superclass : #CPMFrameTransformer,
 	#instVars : [
 		'transactionID',
-		'unitID',
 		'protocolID'
 	],
 	#category : #'Control-Protocols-Modbus-FrameTransformers'
@@ -76,14 +75,4 @@ CPMTCPFrameTransformer >> transactionID [
 { #category : #accessing }
 CPMTCPFrameTransformer >> transactionID: anObject [
 	transactionID := anObject
-]
-
-{ #category : #accessing }
-CPMTCPFrameTransformer >> unitID [
-	^ unitID ifNil:[1]
-]
-
-{ #category : #accessing }
-CPMTCPFrameTransformer >> unitID: anObject [
-	unitID := anObject
 ]

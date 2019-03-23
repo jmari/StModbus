@@ -28,8 +28,7 @@ CPMTTYModbusMaster >> RTUMode [
 { #category : #'connection open/close' }
 CPMTTYModbusMaster >> connectTo:aPort [
 	port := aPort.
-	[self serialPort openPort: aPort] 
-	on:Error do:[serialPort := aPort asFileReference writeStream]
+	self serialPort openPort: aPort
 		
 ]
 
@@ -53,26 +52,31 @@ CPMTTYModbusMaster >> reconnect [
 
 { #category : #'old api' }
 CPMTTYModbusMaster >> send [
-	| response |
+	| response bA |
 
 	self serialPort nextPutAll:
 		(rtuMode 
 			ifTrue:[
 				(CPMTTYRTUFrameTransformer on: currentFunction queryTelegram ) 
+												unitID: currentFunction slaveAddress; 
 												telegram]
 			ifFalse:[
-				((CPMTTYASCIIFrameTransformer on: currentFunction queryTelegram ) 
-												telegram)]).
-			
+				(CPMTTYASCIIFrameTransformer on: currentFunction queryTelegram ) 
+												unitID: currentFunction slaveAddress; 
+												telegram]).
+										
+	[(bA:= self serialPort readByteArray copy) isEmpty ] 
+		whileTrue:[	(Delay forMilliseconds: 100) wait.
+						Processor yield].
 	response := rtuMode 
 					ifTrue:[
 						CPMTTYRTUFrameTransformer 
-								parseFromStream: (ReadStream on:(self serialPort readByteArray ))]
+								parseFromStream: (ReadStream on:bA)]
 					ifFalse:[
 						CPMTTYASCIIFrameTransformer 
-								parseFromStream: (ReadStream on:(self serialPort readByteArray ))].
-	
-	currentFunction updateFromResponseStream: (ReadStream on: response modbusTelegram).
+								parseFromStream: (ReadStream on:bA)].
+
+	^ currentFunction updateFromResponseStream: (ReadStream on: response modbusFunction responseTelegram).
 		
 	
 

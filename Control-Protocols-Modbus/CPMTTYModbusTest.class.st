@@ -16,7 +16,8 @@ CPMTTYModbusTest class >> test [
 { #category : #initialization }
 CPMTTYModbusTest >> setUp [
 	tcpSlave := CPMTTYModbusSlave new.
-	tcpSlave port:'/dev/tty.usbserial-AK072UEL'.
+	tcpSlave unitID: 1;
+				port:'COM4'.
 	tcpSlave serialPort     
         baudRate: 9600;
         dataBits: 8;
@@ -31,7 +32,7 @@ CPMTTYModbusTest >> setUp [
         dataBits: 8;
         stopBitsType: 1;
         parityType: 0.
-	tcpMaster connectTo: '/dev/tty.usbserial-AK072UFR'.
+	tcpMaster connectTo: 'COM3'.
 
 ]
 
@@ -51,6 +52,8 @@ CPMTTYModbusTest >> tcpSlave [
 { #category : #initialization }
 CPMTTYModbusTest >> tearDown [
 
+	tcpMaster disconnect.
 	tcpMaster := nil.
-	tcpSlave stop
+	tcpSlave stop.
+	tcpSlave := nil
 ]

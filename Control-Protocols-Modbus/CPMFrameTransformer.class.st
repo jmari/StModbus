@@ -4,7 +4,8 @@ Class {
 	#instVars : [
 		'frame',
 		'modbusTelegram',
-		'modbusFunction'
+		'modbusFunction',
+		'unitID'
 	],
 	#category : #'Control-Protocols-Modbus-FrameTransformers'
 }
@@ -17,6 +18,7 @@ CPMFrameTransformer class >> on:aModbusTelegram [
 
 { #category : #accessing }
 CPMFrameTransformer >> modbusFunction [
+
 	^ modbusFunction
 ]
 
@@ -38,4 +40,14 @@ CPMFrameTransformer >> modbusTelegram: anObject [
 { #category : #'as yet unclassified' }
 CPMFrameTransformer >> telegram [
 	self subclassResponsibility 
+]
+
+{ #category : #accessing }
+CPMFrameTransformer >> unitID [
+	^ unitID ifNil:[1]
+]
+
+{ #category : #accessing }
+CPMFrameTransformer >> unitID: anObject [
+	unitID := anObject
 ]

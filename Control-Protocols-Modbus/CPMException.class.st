@@ -1,6 +1,6 @@
 Class {
 	#name : #CPMException,
-	#superclass : #Exception,
+	#superclass : #Error,
 	#instVars : [
 		'slaveAddress',
 		'queryFunction'
@@ -16,13 +16,6 @@ CPMException >> LRC [
 { #category : #'as yet unclassified' }
 CPMException >> code [
 	self subclassResponsibility 
-]
-
-{ #category : #accessing }
-CPMException >> defaultAction [
-	"The default action taken if the exception is signaled."
-
-	"Nothing??¿?¿"
 ]
 
 { #category : #'as yet unclassified' }

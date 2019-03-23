@@ -13,12 +13,14 @@ CPMTTYRTUFrameTransformer class >> parseFromStream: aStream [
 	| i frame crc baCrc|
 	i := self new.
 	frame := aStream upToEnd.
-	crc := frame copyFrom:(frame size -30) to: (frame size - 29).	
-	frame := frame copyFrom:28 to: (frame size - 30).	
+	frame isEmpty ifTrue:[^ nil].
+	crc := frame copyFrom:(frame size -29) to: (frame size - 28).	
+	frame := frame copyFrom:29 to: (frame size - 30).	
 	baCrc := (CRC crc16FromCollection: frame) asByteArray.
 	(((baCrc at:1) = (crc at:1)) and:[ ((baCrc at:2) = (crc at:2))])
 		ifFalse:[CPMCRCException signal].
-	i modbusTelegram: (CPMModbusFunction parseFromStream: (ReadStream on:frame)) .
+		
+	i modbusFunction: (CPMModbusFunction parseFromStream: (ReadStream on:frame)) .
 
 	^ i 
 ]

@@ -1,5 +1,5 @@
 Class {
 	#name : #CPMCRCException,
-	#superclass : #Exception,
+	#superclass : #Error,
 	#category : #'Control-Protocols-Modbus-Exceptions'
 }

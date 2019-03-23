@@ -80,12 +80,6 @@ CPMTTYModbusSlave >> port: aPort [
 	port := aPort
 ]
 
-{ #category : #'as yet unclassified' }
-CPMTTYModbusSlave >> readFromSerialPort [
-	
-	^ self serialPort readByteArray 
-]
-
 { #category : #'connection open/close' }
 CPMTTYModbusSlave >> reconnect [
 	self serialPort connectTo: port
@@ -104,34 +98,35 @@ CPMTTYModbusSlave >> serve [
 	
 	[
 	|d  bytesRead |
-	d := Delay forMilliseconds: 1000.
-	[self serialPort  openPort: port]	on:Error do:[serialPort := port asFileReference readStream].
+	d := Delay forMilliseconds: 100.
+	self serialPort  openPort: port.
 	[ stop ] whileFalse:[	
-		bytesRead :=  self readFromSerialPort.
+		bytesRead :=  self serialPort readByteArray.
 		bytesRead  isEmpty
-		ifTrue:[d wait]
+		ifTrue:[d wait.Processor yield]
 		ifFalse: [
 			[	transportFrame := rtuMode
-											ifTrue:[(CPMTTYRTUFrameTransformer  
+											ifTrue:[	(CPMTTYRTUFrameTransformer  
 												parseFromStream: (ReadStream  on: bytesRead ) binary)]
 											ifFalse:[(CPMTTYASCIIFrameTransformer  
-												parseFromStream: (ReadStream  on: bytesRead ) ascii)].
-												
+												parseFromStream: (ReadStream  on: bytesRead ) ascii)].									
 				modbusFunction := transportFrame modbusFunction.
-	
-				(modbusFunction slaveAddress = self unitID )
+				modbusFunction slaveAddress = self unitID 
 				ifTrue:[
-					modbusFunction executeFunctionOn:self dataTable.	
-					response := ((CPMTCPFrameTransformer on:  modbusFunction responseTelegram)
-								transactionID: transportFrame transactionID; 
-								protocolID: transportFrame protocolID; 
-								unitID: transportFrame unitID)]]
+					modbusFunction executeFunctionOn:self dataTable.		
+					response := rtuMode
+											ifTrue:[	(CPMTTYRTUFrameTransformer  on:  modbusFunction responseTelegram)
+															unitID: transportFrame unitID]
+											ifFalse:[(CPMTTYASCIIFrameTransformer  on:  modbusFunction responseTelegram)
+															unitID: transportFrame unitID].
+				]]
 		on:CPMException 
 		do:[:e| 
 			response := ((CPMTCPFrameTransformer on:  e responseTelegram)
 								transactionID: (((bytesRead at: 1) <<8) bitOr: (bytesRead at:2))).
 			"change status register?"].	
-			self serialPort  nextPutAll:response telegram]]
+		self serialPort  nextPutAll:response telegram].
+		]
 	] 
 	ensure:[self disconnect].	 
 ]
