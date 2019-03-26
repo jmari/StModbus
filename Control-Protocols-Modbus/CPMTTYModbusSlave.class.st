@@ -89,7 +89,7 @@ CPMTTYModbusSlave >> reconnect [
 
 { #category : #accessing }
 CPMTTYModbusSlave >> serialPort [
- 	^ serialPort ifNil:[ serialPort := SerialPort new].
+ 	^ serialPort ifNil:[ serialPort := (SerialPort new inputFlowControlType: 2)].
 ]
 
 { #category : #'as yet unclassified' }
@@ -102,6 +102,7 @@ CPMTTYModbusSlave >> serve [
 	self serialPort  openPort: port.
 	[ stop ] whileFalse:[	
 		bytesRead :=  self serialPort readByteArray.
+
 		bytesRead  isEmpty
 		ifTrue:[d wait.Processor yield]
 		ifFalse: [
