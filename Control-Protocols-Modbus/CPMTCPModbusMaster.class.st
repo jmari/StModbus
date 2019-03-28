@@ -77,26 +77,23 @@ CPMTCPModbusMaster >> reconnect [
 
 { #category : #'old api' }
 CPMTCPModbusMaster >> send [
-	| data stream|
+	| data stream receivedData |
 
 	^self socket isConnected 
 		ifTrue:[
 			self mutex critical:[
-				stream := SocketStream on: self socket. 
-				stream binary.
-				stream nextPutAllFlush:((CPMTCPFrameTransformer on: currentFunction queryTelegram ) 
+				self socket sendData: ((CPMTCPFrameTransformer on: currentFunction queryTelegram ) 
 												transactionID: self transactionID; 
 												unitID: currentFunction slaveAddress; 
 												telegram).
-				stream isDataAvailable  ifFalse:[(Delay forMilliseconds: 100) wait].
-				(stream isDataAvailable ) ifTrue:[
-					data := stream next:6.
-					data := stream next: ((data at:5) << 8 bitOr:(data at:6)).
-					self disconnect.
-					currentFunction updateFromResponseStream: (ReadStream on: data).
-					attempts := 0. 
-					currentFunction]
-				]] 
+				receivedData := self socket receiveData asByteArray. 
+				data := receivedData copyFrom:1 to:6.
+				data := receivedData copyFrom:7 to: 6 + ((data at:5) << 8 bitOr:(data at:6)).
+				self disconnect.
+				currentFunction updateFromResponseStream: (ReadStream on: data).
+				attempts := 0. 
+				currentFunction]
+				]
 		ifFalse:[
 			self reconnect.
 			(self attempts < 10) 
