@@ -4,11 +4,11 @@ Class {
 	#instVars : [
 		'connection',
 		'socket',
-		'mutex',
 		'address',
 		'port',
 		'attempts',
 		'connectionPool',
+		'mutex',
 		'transactionID'
 	],
 	#category : #'Control-Protocols-Modbus-Main'
@@ -77,11 +77,11 @@ CPMTCPModbusMaster >> reconnect [
 
 { #category : #'old api' }
 CPMTCPModbusMaster >> send [
-	| data stream receivedData |
-
+	| data receivedData |
+	self mutex critical:[
 	^self socket isConnected 
 		ifTrue:[
-			self mutex critical:[
+		
 				self socket sendData: ((CPMTCPFrameTransformer on: currentFunction queryTelegram ) 
 												transactionID: self transactionID; 
 												unitID: currentFunction slaveAddress; 
@@ -92,15 +92,14 @@ CPMTCPModbusMaster >> send [
 				self disconnect.
 				currentFunction updateFromResponseStream: (ReadStream on: data).
 				attempts := 0. 
-				currentFunction]
-				]
+				currentFunction	]
 		ifFalse:[
 			self reconnect.
 			(self attempts < 10) 
 				ifTrue:[ self send]
 				ifFalse:[
 					attempts := 0.
-					self connectionRefused ] ].
+					self connectionRefused ]]]
 	
  
 ]

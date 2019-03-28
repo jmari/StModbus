@@ -65,7 +65,7 @@ CPMTCPModbusSlave >> listen [
 		[[[ stop ] whileFalse:[		
 			interactionSocket := connectionSocket waitForAcceptFor: 1 ifTimedOut:[nil] .
 			interactionSocket ifNotNil:[
-				[self serve: interactionSocket] forkNamed: 'Modbus srv'
+				self serve: interactionSocket
 				] ]]  
 		ensure:[ self disconnect ] 
 		] forkNamed: 'MorbusSlave#' , self  unitID asString	
