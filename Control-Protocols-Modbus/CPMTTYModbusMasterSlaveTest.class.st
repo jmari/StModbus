@@ -50,7 +50,7 @@ CPMTTYModbusMasterSlaveTest >> testForceSingleCoil [
 ]
 
 { #category : #tests }
-CPMTTYModbusMasterSlaveTest >> testPresetMultipleHoldingRegister [
+CPMTTYModbusMasterSlaveTest >> testPresetMultipleHoldingRegisters [
 	| response checkSum |
 	
 	self tcpMaster  presetMultipleRegisters 
@@ -172,7 +172,7 @@ CPMTTYModbusMasterSlaveTest >> testRemotePresetAndReadHoldingRegister [
 ]
 
 { #category : #tests }
-CPMTTYModbusMasterSlaveTest >> testRemotePresetMultipleHoldingRegister [
+CPMTTYModbusMasterSlaveTest >> testRemotePresetMultipleHoldingRegisters [
 	| response |
 	
 	tcpMaster := self remoteMaster.

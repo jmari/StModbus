@@ -11,14 +11,6 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-CPMModbusFactory >> connectionEstablished [
-]
-
-{ #category : #'as yet unclassified' }
-CPMModbusFactory >> connectionRefused [
-]
-
-{ #category : #'as yet unclassified' }
 CPMModbusFactory >> dataTable [
 	^ dataTable ifNil:[ dataTable:= CPMModbusDataTable new slaveId:self unitID] 
 ]

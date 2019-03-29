@@ -102,7 +102,6 @@ CPMTTYModbusSlave >> serve [
 	self serialPort  openPort: port.
 	[ stop ] whileFalse:[	
 		bytesRead :=  self serialPort readByteArray.
-
 		bytesRead  isEmpty
 		ifTrue:[d wait.Processor yield]
 		ifFalse: [

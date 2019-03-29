@@ -7,7 +7,6 @@ Class {
 		'address',
 		'port',
 		'attempts',
-		'connectionPool',
 		'mutex',
 		'transactionID'
 	],
@@ -29,12 +28,12 @@ CPMTCPModbusMaster class >> defaultPort [
 	^ 1502
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 CPMTCPModbusMaster >> attempts [
 	^ attempts ifNil:[ attempts := 0] ifNotNil:[ attempts := attempts + 1 ]
 ]
 
-{ #category : #'initialize-release' }
+{ #category : #'connection open/close' }
 CPMTCPModbusMaster >> connectTo:anAddress port:aPort [
 	address := anAddress.
 	port := aPort.
@@ -43,18 +42,11 @@ CPMTCPModbusMaster >> connectTo:anAddress port:aPort [
 		
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'connection open/close' }
 CPMTCPModbusMaster >> disconnect [
 	self socket closeAndDestroy.
 	socket := nil
 	
-]
-
-{ #category : #'as yet unclassified' }
-CPMTCPModbusMaster >> dispose [
-	connectionPool := nil.
-	socket := nil.
-	attempts:=0
 ]
 
 { #category : #accessing }
@@ -75,7 +67,7 @@ CPMTCPModbusMaster >> reconnect [
 		
 ]
 
-{ #category : #'old api' }
+{ #category : #sending }
 CPMTCPModbusMaster >> send [
 	| data receivedData |
 	self mutex critical:[
@@ -109,7 +101,7 @@ CPMTCPModbusMaster >> socket [
 	^    socket ifNil:[socket := Socket newTCP ]
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 CPMTCPModbusMaster >> transactionID [
 	^ transactionID ifNil:[transactionID := 1] ifNotNil:[transactionID := transactionID  + 1 ] 
 ]

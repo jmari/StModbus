@@ -15,12 +15,12 @@ CPMTTYModbusMaster class >> connectTo: aSerialPort [
 	^ self new connectTo:aSerialPort
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #modes }
 CPMTTYModbusMaster >> ASCIIMode [
 	rtuMode := false
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #modes }
 CPMTTYModbusMaster >> RTUMode [
 	rtuMode := true
 ]
@@ -32,7 +32,7 @@ CPMTTYModbusMaster >> connectTo:aPort [
 		
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'connection open/close' }
 CPMTTYModbusMaster >> disconnect [
 	self serialPort close
 	
@@ -46,11 +46,14 @@ CPMTTYModbusMaster >> initialize [
 
 { #category : #'connection open/close' }
 CPMTTYModbusMaster >> reconnect [
-	self serialPort openPort: port
+	[self serialPort openPort: port.
+	self connectionEstablished] 
+	on:Error
+	do: [self connectionRefused ]
 		
 ]
 
-{ #category : #'old api' }
+{ #category : #sending }
 CPMTTYModbusMaster >> send [
 	| response bA |
 
@@ -82,7 +85,7 @@ CPMTTYModbusMaster >> send [
 
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 CPMTTYModbusMaster >> serialPort [
  	^ serialPort ifNil:[ serialPort := SerialPort new].
 ]
