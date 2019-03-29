@@ -89,7 +89,7 @@ CPMTCPModbusMaster >> send [
 				receivedData := self socket receiveData asByteArray. 
 				data := receivedData copyFrom:1 to:6.
 				data := receivedData copyFrom:7 to: 6 + ((data at:5) << 8 bitOr:(data at:6)).
-				self disconnect.
+
 				currentFunction updateFromResponseStream: (ReadStream on: data).
 				attempts := 0. 
 				currentFunction	]
@@ -106,8 +106,7 @@ CPMTCPModbusMaster >> send [
 
 { #category : #accessing }
 CPMTCPModbusMaster >> socket [
-	^    socket ifNil:[
-			"connectionpool is Empty" socket := Socket newTCP ]
+	^    socket ifNil:[socket := Socket newTCP ]
 ]
 
 { #category : #'as yet unclassified' }

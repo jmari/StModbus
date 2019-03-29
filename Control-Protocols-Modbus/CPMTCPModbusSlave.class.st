@@ -62,12 +62,10 @@ CPMTCPModbusSlave >> listen [
 	| connectionSocket interactionSocket |
 	connectionSocket := self socket listenOn: self port  backlogSize: 10 interface: #[0 0 0 0]. 
 	serverProcess :=
-		[[[ stop ] whileFalse:[		
-			interactionSocket := connectionSocket waitForAcceptFor: 1 ifTimedOut:[nil] .
-			interactionSocket ifNotNil:[
-				self serve: interactionSocket
-				] ]]  
-		ensure:[ self disconnect ] 
+		[	[[ stop ] whileFalse:[		
+				interactionSocket := connectionSocket waitForAcceptFor: 1 ifTimedOut:[nil] .
+				interactionSocket ifNotNil:[self serve: interactionSocket]]]  
+			ensure:[ self disconnect ] 
 		] forkNamed: 'MorbusSlave#' , self  unitID asString	
 	
 

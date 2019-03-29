@@ -148,7 +148,7 @@ CPMTCPModbusMasterSlaveTest >> testReadInputStatus [
 					
 ]
 
-{ #category : #tests }
+{ #category : #'test-only-remote' }
 CPMTCPModbusMasterSlaveTest >> testRemotePresetAndReadHoldingRegister [
 	"You shoud start a remote Modbus slave (server) put the IP adsress in #master superclass method"
 	| response rm |
@@ -171,7 +171,7 @@ CPMTCPModbusMasterSlaveTest >> testRemotePresetAndReadHoldingRegister [
 
 ]
 
-{ #category : #tests }
+{ #category : #'test-only-remote' }
 CPMTCPModbusMasterSlaveTest >> testRemotePresetMultipleHoldingRegister [
 	| response |
 	
@@ -186,7 +186,7 @@ CPMTCPModbusMasterSlaveTest >> testRemotePresetMultipleHoldingRegister [
 	
 ]
 
-{ #category : #tests }
+{ #category : #'test-only-remote' }
 CPMTCPModbusMasterSlaveTest >> testRemoteSetAndReadCoil [
 
 	| response memoryTable checkSum |
