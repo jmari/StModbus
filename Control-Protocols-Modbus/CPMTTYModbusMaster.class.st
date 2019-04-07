@@ -57,7 +57,7 @@ CPMTTYModbusMaster >> reconnect [
 CPMTTYModbusMaster >> send [
 	| response bA |
 
-	self serialPort nextPutAll:
+	[self serialPort nextPutAll:
 		(rtuMode 
 			ifTrue:[
 				(CPMTTYRTUFrameTransformer on: currentFunction queryTelegram ) 
@@ -77,7 +77,7 @@ CPMTTYModbusMaster >> send [
 								parseFromStream: (ReadStream on:bA)]
 					ifFalse:[
 						CPMTTYASCIIFrameTransformer 
-								parseFromStream: (ReadStream on:bA)].
+								parseFromStream: (ReadStream on:bA)]] forkAndWait. 
 
 	^ currentFunction updateFromResponseStream: (ReadStream on: response modbusFunction responseTelegram).
 		

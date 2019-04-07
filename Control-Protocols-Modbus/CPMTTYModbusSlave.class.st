@@ -89,7 +89,7 @@ CPMTTYModbusSlave >> reconnect [
 
 { #category : #accessing }
 CPMTTYModbusSlave >> serialPort [
- 	^ serialPort ifNil:[ serialPort := (SerialPort new inputFlowControlType: 2)].
+ 	^ serialPort ifNil:[ serialPort := (SerialPort new )].
 ]
 
 { #category : #'as yet unclassified' }

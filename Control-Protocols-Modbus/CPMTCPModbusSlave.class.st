@@ -66,7 +66,7 @@ CPMTCPModbusSlave >> listen [
 				interactionSocket := connectionSocket waitForAcceptFor: 1 ifTimedOut:[nil] .
 				interactionSocket ifNotNil:[self serve: interactionSocket]]]  
 			ensure:[ self disconnect ] 
-		] forkNamed: 'MorbusSlave#' , self  unitID asString	
+		] forkNamed: 'TCP Modbus Slave#' , self  unitID asString	
 	
 
 ]
