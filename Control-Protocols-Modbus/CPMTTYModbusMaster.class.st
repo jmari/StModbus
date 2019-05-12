@@ -67,8 +67,8 @@ CPMTTYModbusMaster >> send [
 				(CPMTTYASCIIFrameTransformer on: currentFunction queryTelegram ) 
 												unitID: currentFunction slaveAddress; 
 												telegram]).
-										
-	[(bA:= self serialPort readByteArray copy) isEmpty ] 
+	(Delay forMilliseconds: 1000) wait.Processor yield.									
+	(bA:= self serialPort readByteArray copy) isEmpty 
 		whileTrue:[	(Delay forMilliseconds: 100) wait.
 						Processor yield].
 	response := rtuMode 
@@ -87,5 +87,5 @@ CPMTTYModbusMaster >> send [
 
 { #category : #accessing }
 CPMTTYModbusMaster >> serialPort [
- 	^ serialPort ifNil:[ serialPort := SerialPort new].
+ 	^ serialPort ifNil:[ serialPort := SerialPort new inputFlowControlType:2;outputFlowControlType: 2].
 ]

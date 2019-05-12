@@ -12,17 +12,17 @@ Class {
 	#category : #'Control-Protocols-Modbus-Functions'
 }
 
-{ #category : #'as yet unclassified' }
+{ #category : #'function-codes' }
 CPMModbusFunction class >> forceMultipleCoilFunctionCode [
 	^16r0F
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'function-codes' }
 CPMModbusFunction class >> forceSingleCoilFunctionCode [
 	^16r05
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'function-codes' }
 CPMModbusFunction class >> maskWriteRegisterFunctionCode [
 	^ 16r16
 ]
@@ -70,7 +70,7 @@ CPMModbusFunction class >> parseFromStream:aStream [
 
 
 	instance ifNil:[ CPMIlegalFunctionException new 
-									queryFunctionCode: f;
+									queryFunctionCode: (f ifNil:[0]);
 									slaveAddress: i;
 									data: aStream upToEnd; 
 									signal]
@@ -84,50 +84,50 @@ CPMModbusFunction class >> parseFromStream:aStream [
 	
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'function-codes' }
 CPMModbusFunction class >> presetMultipleRegisterFunctionCode [
 	^16r10
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'function-codes' }
 CPMModbusFunction class >> presetSingleRegisterFunctionCode [
 	^16r06
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'function-codes' }
 CPMModbusFunction class >> readCoilFunctionCode [
 
 	^ 16r01
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'function-codes' }
 CPMModbusFunction class >> readExceptionStatusFunctionCode [
 
 	^ 16r07
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'function-codes' }
 CPMModbusFunction class >> readHoldingRegisterFunctionCode [
 	^16r03
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'function-codes' }
 CPMModbusFunction class >> readInputRegisterFunctionCode [
 	^16r04
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'function-codes' }
 CPMModbusFunction class >> readInputStatusFunctionCode [
 	
 	^ 16r02
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'function-codes' }
 CPMModbusFunction class >> readWriteRegisterFunctionCode [
 	^16r17
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #'function-codes' }
 CPMModbusFunction class >> reportSlaveIDFunctionCode [
 	^16r11
 ]

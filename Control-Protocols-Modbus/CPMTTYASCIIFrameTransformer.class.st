@@ -15,7 +15,7 @@ CPMTTYASCIIFrameTransformer class >> parseFromStream: aStream [
 	frame isEmpty ifTrue:[^ nil].
 	crc := frame copyFrom:(frame size -29) to: (frame size - 28).	
 	frame := frame copyFrom:29 to: (frame size - 30).	
-	baCrc := (CRC crc16FromCollection: frame) asByteArray.
+	baCrc := (CRC crc16FromModbusFrame: frame) asByteArray.
 	(((baCrc at:1) = (crc at:1)) and:[ ((baCrc at:2) = (crc at:2))])
 		ifFalse:[CPMCRCException signal].
 		

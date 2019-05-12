@@ -14,20 +14,20 @@ CPMTTYRTUFrameTransformer class >> parseFromStream: aStream [
 	i := self new.
 	frame := aStream upToEnd.
 	frame isEmpty ifTrue:[^ nil].
-	crc := frame copyFrom:(frame size -29) to: (frame size - 28).	
-	frame := frame copyFrom:29 to: (frame size - 30).	
-	baCrc := (CRC crc16FromCollection: frame) asByteArray.
-	(((baCrc at:1) = (crc at:1)) and:[ ((baCrc at:2) = (crc at:2))])
-		ifFalse:[CPMCRCException signal].
-		
+	crc := frame copyFrom: (frame size -1) to: frame size.	
+	frame := frame copyFrom:1 to: (frame size - 2).	
+	baCrc := (CRC crc16FromModbusFrame: (frame copyFrom:1 to: frame size)) asByteArray.		
 	i modbusFunction: (CPMModbusFunction parseFromStream: (ReadStream on:frame)) .
-
+	(((baCrc at:1) = (crc at:2)) and:[ ((baCrc at:2) = (crc at:1))])
+		ifFalse:[CPMCRCException signal].
 	^ i 
 ]
 
 { #category : #'as yet unclassified' }
 CPMTTYRTUFrameTransformer >> CRC [
-	^( CRC crc16FromCollection: self modbusTelegram  ) asByteArray
+	| crcWord |
+	crcWord := (CRC crc16FromModbusFrame: self modbusTelegram  ) asByteArray.
+	^ Array with:(crcWord at:2) with:(crcWord at:1)
  	
 ]
 
@@ -38,12 +38,13 @@ CPMTTYRTUFrameTransformer >> header [
 
 { #category : #'as yet unclassified' }
 CPMTTYRTUFrameTransformer >> telegram [
+
 	frame ifNil:[ frame := ReadWriteStream on: OrderedCollection new].
+	self header.
 	frame 
-		nextPutAll:  self header;
 		nextPutAll:  self modbusTelegram;
-		nextPutAll:  self CRC;
-		nextPutAll:  self trailer.
+		nextPutAll:  self CRC.
+	self trailer.
 	^frame contents asByteArray  
 ]
 

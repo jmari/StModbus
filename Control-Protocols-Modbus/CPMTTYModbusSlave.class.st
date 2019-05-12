@@ -89,7 +89,7 @@ CPMTTYModbusSlave >> reconnect [
 
 { #category : #accessing }
 CPMTTYModbusSlave >> serialPort [
- 	^ serialPort ifNil:[ serialPort := (SerialPort new )].
+ 	^ serialPort ifNil:[ serialPort := SerialPort new inputFlowControlType:2;outputFlowControlType: 2 ].
 ]
 
 { #category : #'as yet unclassified' }
@@ -98,7 +98,7 @@ CPMTTYModbusSlave >> serve [
 	
 	[
 	|d  bytesRead |
-	d := Delay forMilliseconds: 100.
+	d := Delay forMilliseconds: self waitingTime.
 	self serialPort  openPort: port.
 	[ stop ] whileFalse:[	
 		bytesRead :=  self serialPort readByteArray.
@@ -120,12 +120,15 @@ CPMTTYModbusSlave >> serve [
 											ifFalse:[(CPMTTYASCIIFrameTransformer  on:  modbusFunction responseTelegram)
 															unitID: transportFrame unitID].
 				]]
-		on:CPMException 
+		on: CPMException
 		do:[:e| 
 			response := ((CPMTCPFrameTransformer on:  e responseTelegram)
 								transactionID: (((bytesRead at: 1) <<8) bitOr: (bytesRead at:2))).
 			"change status register?"].	
-		self serialPort  nextPutAll:response telegram].
+		response ifNotNil:[
+					d wait.Processor yield.
+					self serialPort  nextPutAll:response telegram.
+					d wait.Processor yield]].
 		]
 	] 
 	ensure:[self disconnect].	 
@@ -143,4 +146,10 @@ CPMTTYModbusSlave >> stop [
 	self disconnect.
 	serverProcess 	ifNotNil:[ serverProcess terminate]. 
 	serverProcess := nil
+]
+
+{ #category : #accessing }
+CPMTTYModbusSlave >> waitingTime [ 
+ ^ 8 / self serialPort baudRate  * 3.5 * 1000
+
 ]
