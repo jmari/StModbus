@@ -100,5 +100,5 @@ CPMTTYModbusMaster >> send [
 
 { #category : #accessing }
 CPMTTYModbusMaster >> serialPort [
- 	^ serialPort ifNil:[ serialPort := SerialPort new inputFlowControlType:2;outputFlowControlType: 2].
+ 	^ serialPort ifNil:[ serialPort := SerialPort new].
 ]

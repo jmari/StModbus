@@ -68,7 +68,6 @@ CPMModbusFunction class >> parseFromStream:aStream [
 	(f = self readWriteRegisterFunctionCode ) ifTrue:[ instance:= CPMReadWriteRegistersFunction  newFromStream:aStream  ].
 	(f = self maskWriteRegisterFunctionCode ) ifTrue:[ instance:= CPMMaskWriteRegisterFunction newFromStream:aStream  ].
 
-
 	instance ifNil:[ CPMIlegalFunctionException new 
 									queryFunctionCode: (f ifNil:[0]);
 									slaveAddress: i;

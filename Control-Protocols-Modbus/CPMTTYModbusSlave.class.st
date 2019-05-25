@@ -82,15 +82,19 @@ CPMTTYModbusSlave >> port: aPort [
 
 { #category : #reading }
 CPMTTYModbusSlave >> readByteArray [
-    | buffer nRead bytesArray |
-    buffer := Array new: 65535.
- 	 bytesArray := Array new.
-    [   nRead := self serialPort readInto: buffer startingAt: 1.
-        nRead isZero
-		    ifFalse: [bytesArray:=buffer copyFrom: 1 to: nRead].
-    ] on: PrimitiveFailed
-      do: [ self serialPort close ].
-	^ bytesArray
+   | buffer nRead bytesRead oc |
+	buffer := ByteArray new: 1.
+	bytesRead := 0.
+	oc := OrderedCollection new.
+	nRead := self serialPort readInto: buffer startingAt: 1.
+	[nRead isZero] whileFalse:[
+      bytesRead := bytesRead + nRead.
+		oc add:buffer first.
+		nRead := self serialPort readInto: buffer startingAt: 1.
+		
+    ].
+	 	
+	^ oc asByteArray
 ]
 
 { #category : #'connection open/close' }
@@ -102,7 +106,7 @@ CPMTTYModbusSlave >> reconnect [
 
 { #category : #accessing }
 CPMTTYModbusSlave >> serialPort [
- 	^ serialPort ifNil:[ serialPort := SerialPort new inputFlowControlType:2;outputFlowControlType: 2 ].
+ 	^ serialPort ifNil:[ serialPort := (SerialPort new )].
 ]
 
 { #category : #'as yet unclassified' }
@@ -114,11 +118,13 @@ CPMTTYModbusSlave >> serve [
 	d := Delay forMilliseconds: self waitingTime.
 	self serialPort  openPort: port.
 	[ stop ] whileFalse:[	
-		bytesRead :=  self readByteArray.
+		
+		bytesRead :=  self serialPort readByteArray.
 		bytesRead  isEmpty
 		ifTrue:[d wait.Processor yield]
 		ifFalse: [
-			[	transportFrame := rtuMode
+			[	
+				transportFrame := rtuMode
 											ifTrue:[	(CPMTTYRTUFrameTransformer  
 												parseFromStream: (ReadStream  on: bytesRead ) binary)]
 											ifFalse:[(CPMTTYASCIIFrameTransformer  
@@ -139,7 +145,6 @@ CPMTTYModbusSlave >> serve [
 								transactionID: (((bytesRead at: 1) <<8) bitOr: (bytesRead at:2))).
 			"change status register?"].	
 		response ifNotNil:[
-					d wait.Processor yield.
 					self serialPort  nextPutAll:response telegram.
 					d wait.Processor yield]].
 		]
