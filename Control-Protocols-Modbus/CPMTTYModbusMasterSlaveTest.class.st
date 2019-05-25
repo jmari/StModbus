@@ -8,6 +8,52 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
+CPMTTYModbusMasterSlaveTest class >> exampleOfInitializationMaster [
+	| ttyMaster data |
+   ttyMaster:= CPMTTYModbusMaster new.
+	
+	ttyMaster serialPort     
+        baudRate: 9600;
+        dataBits: 8;
+        stopBitsType: 1;
+        parityType: 0.
+	ttyMaster connectTo: '/dev/tty.usbserial-AK072UFR'.
+
+
+	ttyMaster presetSingleRegister 
+		slaveAddress:16r1;
+		startingAddress:16r00;
+		data: #[0 2].
+	ttyMaster send.
+	
+	ttyMaster readHoldingRegister 
+		slaveAddress:16r1;
+		startingAddress:16r00.
+		
+	data := ttyMaster send.
+]
+
+{ #category : #'as yet unclassified' }
+CPMTTYModbusMasterSlaveTest class >> exampleOfInitializationSlave [
+
+	| ttySlave |
+	ttySlave := CPMTTYModbusSlave new.
+	ttySlave unitID: 1;
+				port:'/dev/tty.usbserial-AK072UEL'.
+	ttySlave serialPort     
+        baudRate: 9600;
+        dataBits: 8;
+        stopBitsType: 1;
+        parityType: 0.
+	ttySlave start.
+	
+	"STOP"
+	ttySlave stop.
+	ttySlave := nil.
+	
+]
+
+{ #category : #'as yet unclassified' }
 CPMTTYModbusMasterSlaveTest class >> test [
 	self new testPresetSingleHoldingRegister 
 ]

@@ -44,6 +44,19 @@ CPMTTYModbusMaster >> initialize [
 	rtuMode := true
 ]
 
+{ #category : #reading }
+CPMTTYModbusMaster >> readByteArray [
+    | buffer nRead bytesArray |
+    buffer := Array new: 65535.
+ 	 bytesArray := Array new.
+    [   nRead := self serialPort readInto: buffer startingAt: 1.
+        nRead isZero
+		    ifFalse: [bytesArray:=buffer copyFrom: 1 to: nRead].
+    ] on: PrimitiveFailed
+      do: [ self serialPort close ].
+	^ bytesArray
+]
+
 { #category : #'connection open/close' }
 CPMTTYModbusMaster >> reconnect [
 	[self serialPort openPort: port.
@@ -68,7 +81,7 @@ CPMTTYModbusMaster >> send [
 												unitID: currentFunction slaveAddress; 
 												telegram]).
 	(Delay forMilliseconds: 1000) wait.Processor yield.									
-	(bA:= self serialPort readByteArray copy) isEmpty 
+	(bA:= self readByteArray copy) isEmpty 
 		whileTrue:[	(Delay forMilliseconds: 100) wait.
 						Processor yield].
 	response := rtuMode 

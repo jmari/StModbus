@@ -80,6 +80,19 @@ CPMTTYModbusSlave >> port: aPort [
 	port := aPort
 ]
 
+{ #category : #reading }
+CPMTTYModbusSlave >> readByteArray [
+    | buffer nRead bytesArray |
+    buffer := Array new: 65535.
+ 	 bytesArray := Array new.
+    [   nRead := self serialPort readInto: buffer startingAt: 1.
+        nRead isZero
+		    ifFalse: [bytesArray:=buffer copyFrom: 1 to: nRead].
+    ] on: PrimitiveFailed
+      do: [ self serialPort close ].
+	^ bytesArray
+]
+
 { #category : #'connection open/close' }
 CPMTTYModbusSlave >> reconnect [
 	self serialPort connectTo: port
@@ -101,7 +114,7 @@ CPMTTYModbusSlave >> serve [
 	d := Delay forMilliseconds: self waitingTime.
 	self serialPort  openPort: port.
 	[ stop ] whileFalse:[	
-		bytesRead :=  self serialPort readByteArray.
+		bytesRead :=  self readByteArray.
 		bytesRead  isEmpty
 		ifTrue:[d wait.Processor yield]
 		ifFalse: [
