@@ -11,8 +11,23 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
+CPMModbusFactory >> connectionEstablished [
+	^ self
+]
+
+{ #category : #'as yet unclassified' }
+CPMModbusFactory >> connectionRefused [
+	^ self
+]
+
+{ #category : #'as yet unclassified' }
 CPMModbusFactory >> dataTable [
 	^ dataTable ifNil:[ dataTable:= CPMModbusDataTable new slaveId:self unitID] 
+]
+
+{ #category : #'connection open/close' }
+CPMModbusFactory >> disconnect [ 	
+	self subclassResponsibility 
 ]
 
 { #category : #functions }

@@ -1,14 +1,11 @@
 Class {
 	#name : #CPMTTYModbusSlave,
-	#superclass : #CPMModbusSlave,
+	#superclass : #CPMTTYModbusFactory,
 	#instVars : [
 		'socket',
 		'connectionPool',
 		'stop',
-		'serverProcess',
-		'port',
-		'rtuMode',
-		'serialPort'
+		'serverProcess'
 	],
 	#category : #'Control-Protocols-Modbus-Main'
 }
@@ -35,16 +32,6 @@ CPMTTYModbusSlave class >> startOn: aPort [
 	^ ( self on:aPort) start
 ]
 
-{ #category : #'as yet unclassified' }
-CPMTTYModbusSlave >> ASCIIMode [
-	rtuMode := false
-]
-
-{ #category : #'as yet unclassified' }
-CPMTTYModbusSlave >> RTUMode [
-	rtuMode := true
-]
-
 { #category : #'connection open/close' }
 CPMTTYModbusSlave >> disconnect [
 	self serialPort close
@@ -52,16 +39,7 @@ CPMTTYModbusSlave >> disconnect [
 	
 ]
 
-{ #category : #initialization }
-CPMTTYModbusSlave >> initialize [
-	super initialize.
-	rtuMode := true.
-	stop := false.
-
-	
-]
-
-{ #category : #'as yet unclassified' }
+{ #category : #accessing }
 CPMTTYModbusSlave >> isRunning [ 
 	^ stop 
 		ifNil:[
@@ -70,61 +48,18 @@ CPMTTYModbusSlave >> isRunning [
 		ifNotNil:[ stop not].
 ]
 
-{ #category : #'as yet unclassified' }
-CPMTTYModbusSlave >> port [
-	^ port ifNil:[port := self class defaultPort]
-]
-
-{ #category : #'as yet unclassified' }
-CPMTTYModbusSlave >> port: aPort [
-	port := aPort
-]
-
-{ #category : #reading }
-CPMTTYModbusSlave >> readByteArray [
-   | buffer nRead bytesRead oc |
-	buffer := ByteArray new: 1.
-	bytesRead := 0.
-	oc := OrderedCollection new.
-	nRead := self serialPort readInto: buffer startingAt: 1.
-	[nRead isZero] whileFalse:[
-      bytesRead := bytesRead + nRead.
-		oc add:buffer first.
-		nRead := self serialPort readInto: buffer startingAt: 1.
-		
-    ].
-	 	
-	^ oc asByteArray
-]
-
-{ #category : #'connection open/close' }
-CPMTTYModbusSlave >> reconnect [
-	self serialPort connectTo: port
-	
-	
-]
-
-{ #category : #accessing }
-CPMTTYModbusSlave >> serialPort [
- 	^ serialPort ifNil:[ serialPort := (SerialPort new )].
-]
-
-{ #category : #'as yet unclassified' }
+{ #category : #lifecycle }
 CPMTTYModbusSlave >> serve [
 	| modbusFunction response  transportFrame |
-	
 	[
 	|d  bytesRead |
-	d := Delay forMilliseconds: self waitingTime.
-	self serialPort  openPort: port.
+	d := Delay forMilliseconds:  (self waitingTimeFor: 1.5).
+	self connectTo: port.
 	[ stop ] whileFalse:[	
-		
-		bytesRead :=  self serialPort readByteArray.
-		bytesRead  isEmpty
-		ifTrue:[d wait.Processor yield]
+		bytesRead :=  self readByteArray.
+		bytesRead isEmpty
 		ifFalse: [
-			[	
-				transportFrame := rtuMode
+			[	transportFrame := self isRTUMode
 											ifTrue:[	(CPMTTYRTUFrameTransformer  
 												parseFromStream: (ReadStream  on: bytesRead ) binary)]
 											ifFalse:[(CPMTTYASCIIFrameTransformer  
@@ -133,41 +68,40 @@ CPMTTYModbusSlave >> serve [
 				modbusFunction slaveAddress = self unitID 
 				ifTrue:[
 					modbusFunction executeFunctionOn:self dataTable.		
-					response := rtuMode
+					response := self isRTUMode
 											ifTrue:[	(CPMTTYRTUFrameTransformer  on:  modbusFunction responseTelegram)
 															unitID: transportFrame unitID]
 											ifFalse:[(CPMTTYASCIIFrameTransformer  on:  modbusFunction responseTelegram)
 															unitID: transportFrame unitID].
 				]]
-		on: CPMException
+		on: Exception
 		do:[:e| 
-			response := ((CPMTCPFrameTransformer on:  e responseTelegram)
+			response:= (e isKindOf: CPMException) 
+				ifTrue:[((CPMTCPFrameTransformer on:  (e 
+																	slaveAddress: self unitID ;
+																	responseTelegram))
 								transactionID: (((bytesRead at: 1) <<8) bitOr: (bytesRead at:2))).
-			"change status register?"].	
+			"change status register?"]
+				ifFalse:[
+					Transcript show: e asString.nil]].	
 		response ifNotNil:[
 					self serialPort  nextPutAll:response telegram.
-					d wait.Processor yield]].
+					]]
 		]
 	] 
 	ensure:[self disconnect].	 
 ]
 
-{ #category : #accessing }
+{ #category : #lifecycle }
 CPMTTYModbusSlave >> start [
 	stop := false.
 	[self serve] forkNamed: 'Serial Modbus Slave #', self unitID asString
 ]
 
-{ #category : #'as yet unclassified' }
+{ #category : #lifecycle }
 CPMTTYModbusSlave >> stop [
 	stop := true.
 	self disconnect.
 	serverProcess 	ifNotNil:[ serverProcess terminate]. 
 	serverProcess := nil
-]
-
-{ #category : #accessing }
-CPMTTYModbusSlave >> waitingTime [ 
- ^ 8 / self serialPort baudRate  * 3.5 * 1000
-
 ]

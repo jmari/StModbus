@@ -1,11 +1,8 @@
 Class {
 	#name : #CPMTTYModbusMaster,
-	#superclass : #CPMModbusMaster,
+	#superclass : #CPMTTYModbusFactory,
 	#instVars : [
-		'mutex',
-		'port',
-		'serialPort',
-		'rtuMode'
+		'mutex'
 	],
 	#category : #'Control-Protocols-Modbus-Main'
 }
@@ -15,51 +12,15 @@ CPMTTYModbusMaster class >> connectTo: aSerialPort [
 	^ self new connectTo:aSerialPort
 ]
 
-{ #category : #modes }
-CPMTTYModbusMaster >> ASCIIMode [
-	rtuMode := false
-]
-
-{ #category : #modes }
-CPMTTYModbusMaster >> RTUMode [
-	rtuMode := true
-]
-
-{ #category : #'connection open/close' }
-CPMTTYModbusMaster >> connectTo:aPort [
-	port := aPort.
-	self serialPort openPort: aPort
-		
-]
-
 { #category : #'connection open/close' }
 CPMTTYModbusMaster >> disconnect [
 	self serialPort close
 	
 ]
 
-{ #category : #initialization }
-CPMTTYModbusMaster >> initialize [
-	super initialize.
-	rtuMode := true
-]
-
-{ #category : #reading }
-CPMTTYModbusMaster >> readByteArray [
-    | buffer nRead bytesArray |
-    buffer := Array new: 65535.
- 	 bytesArray := Array new.
-    [   nRead := self serialPort readInto: buffer startingAt: 1.
-        nRead isZero
-		    ifFalse: [bytesArray:=buffer copyFrom: 1 to: nRead].
-    ] on: PrimitiveFailed
-      do: [ self serialPort close ].
-	^ bytesArray
-]
-
 { #category : #'connection open/close' }
 CPMTTYModbusMaster >> reconnect [
-	[self serialPort openPort: port.
+	[self connectTo: self port.
 	self connectionEstablished] 
 	on:Error
 	do: [self connectionRefused ]
@@ -68,10 +29,12 @@ CPMTTYModbusMaster >> reconnect [
 
 { #category : #sending }
 CPMTTYModbusMaster >> send [
-	| response bA |
-
-	[self serialPort nextPutAll:
-		(rtuMode 
+	| response bA d |
+	"send query"
+	d := Delay forMilliseconds:  (self waitingTimeFor: 3.5).
+	d wait.
+	self serialPort nextPutAll:
+		(self isRTUMode 
 			ifTrue:[
 				(CPMTTYRTUFrameTransformer on: currentFunction queryTelegram ) 
 												unitID: currentFunction slaveAddress; 
@@ -80,25 +43,18 @@ CPMTTYModbusMaster >> send [
 				(CPMTTYASCIIFrameTransformer on: currentFunction queryTelegram ) 
 												unitID: currentFunction slaveAddress; 
 												telegram]).
-	(Delay forMilliseconds: 1000) wait.Processor yield.									
+	"read response"		
+	d wait.				
 	(bA:= self readByteArray copy) isEmpty 
-		whileTrue:[	(Delay forMilliseconds: 100) wait.
-						Processor yield].
-	response := rtuMode 
+		ifFalse:[	
+			response := self isRTUMode 
 					ifTrue:[
 						CPMTTYRTUFrameTransformer 
 								parseFromStream: (ReadStream on:bA)]
 					ifFalse:[
 						CPMTTYASCIIFrameTransformer 
-								parseFromStream: (ReadStream on:bA)]] forkAndWait. 
-
-	^ currentFunction updateFromResponseStream: (ReadStream on: response modbusFunction responseTelegram).
-		
-	
-
-]
-
-{ #category : #accessing }
-CPMTTYModbusMaster >> serialPort [
- 	^ serialPort ifNil:[ serialPort := SerialPort new].
+								parseFromStream: (ReadStream on:bA)].
+			d wait.
+			^ currentFunction updateFromResponseStream: (ReadStream on: response modbusFunction responseTelegram)].
+		^ nil 
 ]

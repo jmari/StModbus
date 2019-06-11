@@ -1,6 +1,6 @@
 Class {
 	#name : #CPMTCPModbusSlave,
-	#superclass : #CPMModbusSlave,
+	#superclass : #CPMTCPModbusFactory,
 	#instVars : [
 		'socket',
 		'connectionPool',
@@ -12,13 +12,20 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-CPMTCPModbusSlave class >> defaultPort [
-	^ 1502
+CPMTCPModbusSlave class >> on: aPort [
+	^ self quotedNew port:aPort
+			
+	
 ]
 
 { #category : #'as yet unclassified' }
-CPMTCPModbusSlave class >> on: aPort [
-	^ self quotedNew port:aPort
+CPMTCPModbusSlave class >> quotedNew [
+	|i|
+	(self allInstances size <= 16rFF)
+		ifTrue:[
+			i := self new]
+		ifFalse:[ CPMTooManySlaves signal].
+	^ i
 			
 	
 ]

@@ -14,10 +14,10 @@ CPMTCPModbusMasterSlaveTest class >> test [
 
 { #category : #tests }
 CPMTCPModbusMasterSlaveTest >> testForceMultipleCoils [
-	| response memoryTable checkSum |
+	| memoryTable checkSum response |
 	
 	memoryTable := CPMModbusDataTable new.
-	( 0 to: 1024 ) do:[:anAddress| memoryTable setInputAt: anAddress put: anAddress  % 2 ] . 	
+	0 to: 1024  do:[:anAddress| memoryTable setInputAt: anAddress put: anAddress  % 2 ] . 	
 	
 	self tcpMaster forceMultipleCoils 
 		slaveAddress:16r1;

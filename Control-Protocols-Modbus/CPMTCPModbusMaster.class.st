@@ -1,6 +1,6 @@
 Class {
 	#name : #CPMTCPModbusMaster,
-	#superclass : #CPMModbusMaster,
+	#superclass : #CPMTCPModbusFactory,
 	#instVars : [
 		'connection',
 		'socket',
@@ -21,11 +21,6 @@ CPMTCPModbusMaster class >> connectTo: anAddress [
 { #category : #'as yet unclassified' }
 CPMTCPModbusMaster class >> connectTo: anAddress port:aPort [
 	^ self new connectTo:anAddress port:aPort
-]
-
-{ #category : #defaults }
-CPMTCPModbusMaster class >> defaultPort [
-	^ 1502
 ]
 
 { #category : #accessing }
