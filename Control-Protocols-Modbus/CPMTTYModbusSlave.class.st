@@ -52,18 +52,21 @@ CPMTTYModbusSlave >> isRunning [
 CPMTTYModbusSlave >> serve [
 	| modbusFunction response  transportFrame |
 	[
-	|d  bytesRead |
-	d := Delay forMilliseconds:  (self waitingTimeFor: 1.5).
+	|bytesRead |
+
 	self connectTo: port.
 	[ stop ] whileFalse:[	
 		bytesRead :=  self readByteArray.
 		bytesRead isEmpty
 		ifFalse: [
-			[	transportFrame := self isRTUMode
+			[	
+				Transcript crShow: '<-',bytesRead asArray asString.
+				transportFrame := self isRTUMode
 											ifTrue:[	(CPMTTYRTUFrameTransformer  
 												parseFromStream: (ReadStream  on: bytesRead ) binary)]
 											ifFalse:[(CPMTTYASCIIFrameTransformer  
-												parseFromStream: (ReadStream  on: bytesRead ) ascii)].									
+												parseFromStream: (ReadStream  on: bytesRead ) ascii)].	
+																				
 				modbusFunction := transportFrame modbusFunction.
 				modbusFunction slaveAddress = self unitID 
 				ifTrue:[
@@ -77,16 +80,17 @@ CPMTTYModbusSlave >> serve [
 		on: Exception
 		do:[:e| 
 			response:= (e isKindOf: CPMException) 
-				ifTrue:[((CPMTCPFrameTransformer on:  (e 
+				ifTrue:[
+					
+					(CPMTTYRTUFrameTransformer on:  (e 
 																	slaveAddress: self unitID ;
-																	responseTelegram))
-								transactionID: (((bytesRead at: 1) <<8) bitOr: (bytesRead at:2))).
-			"change status register?"]
-				ifFalse:[
-					Transcript show: e asString.nil]].	
+																	responseTelegram)) unitID: self unitID.
+					]
+				ifFalse:[nil]].	
+
 		response ifNotNil:[
-					self serialPort  nextPutAll:response telegram.
-					]]
+			Transcript crShow: '->', response telegram asArray asString.
+			self serialPort  nextPutAll:response telegram	]]
 		]
 	] 
 	ensure:[self disconnect].	 

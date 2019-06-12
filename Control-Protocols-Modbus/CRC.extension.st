@@ -15,5 +15,5 @@ CRC class >> crc16FromModbusFrame: aCollection [
 			message: aCollection;
 			yourself.
 			
-	^ instance runRefInRefOut
+	^ instance runRefInRefOut.
 ]

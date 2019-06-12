@@ -32,7 +32,6 @@ CPMTTYModbusMaster >> send [
 	| response bA d |
 	"send query"
 	d := Delay forMilliseconds:  (self waitingTimeFor: 3.5).
-	d wait.
 	self serialPort nextPutAll:
 		(self isRTUMode 
 			ifTrue:[
@@ -44,7 +43,7 @@ CPMTTYModbusMaster >> send [
 												unitID: currentFunction slaveAddress; 
 												telegram]).
 	"read response"		
-	d wait.				
+	
 	(bA:= self readByteArray copy) isEmpty 
 		ifFalse:[	
 			response := self isRTUMode 

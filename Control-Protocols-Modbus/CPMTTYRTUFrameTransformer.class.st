@@ -27,7 +27,7 @@ CPMTTYRTUFrameTransformer class >> parseFromStream: aStream [
 CPMTTYRTUFrameTransformer >> CRC [
 	| crcWord |
 	crcWord := (CRC crc16FromModbusFrame: self modbusTelegram  ) asByteArray.
-	^ Array with:(crcWord at:2) with:(crcWord at:1)
+	^ Array with:(crcWord at:2 ifAbsent:[0]) with:(crcWord at:1)
  	
 ]
 
@@ -40,11 +40,10 @@ CPMTTYRTUFrameTransformer >> header [
 CPMTTYRTUFrameTransformer >> telegram [
 
 	frame ifNil:[ frame := ReadWriteStream on: OrderedCollection new].
-	self header.
 	frame 
 		nextPutAll:  self modbusTelegram;
 		nextPutAll:  self CRC.
-	self trailer.
+
 	^frame contents asByteArray  
 ]
 

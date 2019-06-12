@@ -53,8 +53,8 @@ CPMTTYModbusFactory >> readByteArray [
    | buffer nRead started bytesRead timeout2 |
 
 	buffer := ByteArray new: 256.
-	timeout := self waitingTimeFor:3.5. "waiting time for 3.5 chars in milliseconds"
-	timeout2 := self waitingTimeFor:3.5. "waiting time for 3.5 chars in milliseconds"
+	timeout := self waitingTimeFor:10. "waiting time should be  3.5 chars in milliseconds"
+	timeout2 := self waitingTimeFor:10. "waiting time should be  1.5 chars in milliseconds"
 	started := Time millisecondClockValue.
 	bytesRead := 0.
 	[ Time millisecondClockValue - started < timeout]
@@ -87,12 +87,13 @@ CPMTTYModbusFactory >> waitingTimeFor:numberOfChars [
 	framesPerCharacters :=(framesPerCharacters - framesPerCharacters asInteger) > 0 
 									ifTrue:[ framesPerCharacters asInteger + 1]
 									ifFalse:[framesPerCharacters asInteger].
- ^  ((frameSize * framesPerCharacters) + (8*numberOfChars)) / self serialPort baudRate 
+	"shoud be self serialPort baudRate  but the timming seems to be a standard"
+ ^  (((frameSize * framesPerCharacters) + (8*numberOfChars)) / 4800 )*1000
 
 	"parity: 
 		0 - no parity"
 	"stopBits:
 		0 - 1.5 stop bits
 		1 - one stop bit
-		2 - two stop bits"
+		2 - two stop bits" 
 ]
