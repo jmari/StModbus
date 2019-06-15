@@ -90,27 +90,28 @@ CPMTCPModbusSlave >> port: aPort [
 
 { #category : #'as yet unclassified' }
 CPMTCPModbusSlave >> serve:interactionSocket [
-	| modbusFunction response data transportFrame |
+	| modbusFunction response data frameWrapper |
 	
 	[
 	[ stop ] whileFalse:[	
 		interactionSocket waitForDataIfClosed:[^self].
 		data := interactionSocket  receiveData asByteArray.
-		[	transportFrame := (CPMTCPFrameTransformer  
+		[	frameWrapper := (CPMTCPFrameWrapper  
 							parseFromStream: (ReadStream  on: data ) binary).
 							
-			modbusFunction := transportFrame modbusFunction.
-
+			modbusFunction := frameWrapper modbusFunction.
+			
 			(modbusFunction slaveAddress = self unitID )
 				ifTrue:[
 					modbusFunction executeFunctionOn:self dataTable.	
-					response := ((CPMTCPFrameTransformer on:  modbusFunction responseTelegram)
-								transactionID: transportFrame transactionID; 
-								protocolID: transportFrame protocolID; 
-								unitID: transportFrame unitID)]]
+					"TO-DO. Why do I have to create a new Frame Wrapper insted of using the same"
+					response := ((CPMTCPFrameWrapper on:  modbusFunction responseTelegram)
+								transactionID: frameWrapper transactionID; 
+								protocolID: frameWrapper protocolID; 
+								unitID: frameWrapper unitID)]]
 		on:CPMException 
 		do:[:e| 
-			response := ((CPMTCPFrameTransformer on:  e responseTelegram)
+			response := ((CPMTCPFrameWrapper on:  e responseTelegram)
 								transactionID: (((data at: 1) <<8) bitOr: (data at:2))).
 			"change status register?"].	
 			interactionSocket sendData: response telegram]

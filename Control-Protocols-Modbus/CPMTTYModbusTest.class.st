@@ -15,7 +15,7 @@ CPMTTYModbusTest class >> test [
 
 { #category : #initialization }
 CPMTTYModbusTest >> setUp [
-	tcpSlave := CPMTTYModbusSlave new.
+"	tcpSlave := CPMTTYModbusSlave new.
 	tcpSlave unitID: 1;
 				port:'COM4'.
 	tcpSlave serialPort     
@@ -33,7 +33,7 @@ CPMTTYModbusTest >> setUp [
         stopBitsType: 1;
         parityType: 0.
 	tcpMaster connectTo: 'COM3'.
-
+"
 ]
 
 { #category : #accessing }
@@ -51,9 +51,9 @@ CPMTTYModbusTest >> tcpSlave [
 
 { #category : #initialization }
 CPMTTYModbusTest >> tearDown [
-
+"
 	tcpMaster disconnect.
 	tcpMaster := nil.
 	tcpSlave stop.
-	tcpSlave := nil
+	tcpSlave := nil"
 ]

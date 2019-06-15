@@ -35,23 +35,23 @@ CPMTTYModbusMaster >> send [
 	self serialPort nextPutAll:
 		(self isRTUMode 
 			ifTrue:[
-				(CPMTTYRTUFrameTransformer on: currentFunction queryTelegram ) 
+				(CPMTTYRTUFrameWrapper on: currentFunction queryTelegram ) 
 												unitID: currentFunction slaveAddress; 
 												telegram]
 			ifFalse:[
-				(CPMTTYASCIIFrameTransformer on: currentFunction queryTelegram ) 
+				(CPMTTYASCIIFrameWrapper on: currentFunction queryTelegram ) 
 												unitID: currentFunction slaveAddress; 
 												telegram]).
 	"read response"		
 	
-	(bA:= self readByteArray copy) isEmpty 
+	(bA:= self readByteArray) isEmpty 
 		ifFalse:[	
 			response := self isRTUMode 
 					ifTrue:[
-						CPMTTYRTUFrameTransformer 
+						CPMTTYRTUFrameWrapper 
 								parseFromStream: (ReadStream on:bA)]
 					ifFalse:[
-						CPMTTYASCIIFrameTransformer 
+						CPMTTYASCIIFrameWrapper 
 								parseFromStream: (ReadStream on:bA)].
 			d wait.
 			^ currentFunction updateFromResponseStream: (ReadStream on: response modbusFunction responseTelegram)].

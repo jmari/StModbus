@@ -59,6 +59,13 @@ CPMTTYModbusMasterSlaveTest class >> test [
 ]
 
 { #category : #tests }
+CPMTTYModbusMasterSlaveTest >> testASCIIParse [
+	|frameTransformer|
+ 	frameTransformer := CPMTTYASCIIFrameWrapper parseFromStream: (ReadStream on:#(58 48 49 48 51 48 48 48 48 48 48 48 65 70 50 13 10)).
+
+]
+
+{ #category : #tests }
 CPMTTYModbusMasterSlaveTest >> testForceMultipleCoils [
 	| response memoryTable checkSum |
 	
@@ -93,6 +100,12 @@ CPMTTYModbusMasterSlaveTest >> testForceSingleCoil [
 	checkSum := 	self tcpSlave dataTable table inject: 0 into:[:chs :aRow| chs + aRow].
 	self assert: checkSum equals: 3
 					
+]
+
+{ #category : #tests }
+CPMTTYModbusMasterSlaveTest >> testLRC [
+
+ self assert:(CPMTTYASCIIFrameWrapper new LRC: #(17 3 0 107 0 3)) equals: #($7 $E) .
 ]
 
 { #category : #tests }

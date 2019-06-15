@@ -69,7 +69,7 @@ CPMTCPModbusMaster >> send [
 	^self socket isConnected 
 		ifTrue:[
 		
-				self socket sendData: ((CPMTCPFrameTransformer on: currentFunction queryTelegram ) 
+				self socket sendData: ((CPMTCPFrameWrapper on: currentFunction queryTelegram ) 
 												transactionID: self transactionID; 
 												unitID: currentFunction slaveAddress; 
 												telegram).

@@ -1,15 +1,15 @@
 Class {
-	#name : #CPMTCPFrameTransformer,
-	#superclass : #CPMFrameTransformer,
+	#name : #CPMTCPFrameWrapper,
+	#superclass : #CPMFrameWrapper,
 	#instVars : [
 		'transactionID',
 		'protocolID'
 	],
-	#category : #'Control-Protocols-Modbus-FrameTransformers'
+	#category : #'Control-Protocols-Modbus-FrameWrappers'
 }
 
 { #category : #parsing }
-CPMTCPFrameTransformer class >> parseFromStream: aStream [
+CPMTCPFrameWrapper class >> parseFromStream: aStream [
 	| i |
 	i := self new.
 
@@ -25,7 +25,7 @@ CPMTCPFrameTransformer class >> parseFromStream: aStream [
 ]
 
 { #category : #'as yet unclassified' }
-CPMTCPFrameTransformer >> header [
+CPMTCPFrameWrapper >> header [
 	| s |
 	s :=ByteArray new:6.
 	s at:1 put:  self transactionID >> 8.
@@ -41,17 +41,17 @@ CPMTCPFrameTransformer >> header [
 ]
 
 { #category : #accessing }
-CPMTCPFrameTransformer >> protocolID [
+CPMTCPFrameWrapper >> protocolID [
 	^ protocolID ifNil:[0]
 ]
 
 { #category : #accessing }
-CPMTCPFrameTransformer >> protocolID: twoBytes [
+CPMTCPFrameWrapper >> protocolID: twoBytes [
 	protocolID := twoBytes
 ]
 
 { #category : #'as yet unclassified' }
-CPMTCPFrameTransformer >> telegram [
+CPMTCPFrameWrapper >> telegram [
 
 	self modbusTelegram at:1 put: self unitID.
 	frame := ReadWriteStream on: OrderedCollection new.
@@ -62,17 +62,17 @@ CPMTCPFrameTransformer >> telegram [
 ]
 
 { #category : #'as yet unclassified' }
-CPMTCPFrameTransformer >> trailer [
+CPMTCPFrameWrapper >> trailer [
 	^ String crlf asByteArray 
  	
 ]
 
 { #category : #accessing }
-CPMTCPFrameTransformer >> transactionID [
+CPMTCPFrameWrapper >> transactionID [
 	^ transactionID ifNil:[0]
 ]
 
 { #category : #accessing }
-CPMTCPFrameTransformer >> transactionID: anObject [
+CPMTCPFrameWrapper >> transactionID: anObject [
 	transactionID := anObject
 ]

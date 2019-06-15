@@ -51,7 +51,7 @@ CPMModbusFrameTest >> testReadInputStatus [
 	mf data: (memoryTable readInputsStartingAt: mf startingAddress  numberOfPoints: mf numberOfCoils).
 			
 	self assert: ((mf data at:16r1) = 16rAA). 	
-	resp := CPMTCPFrameTransformer on: mf responseTelegram.
+	resp := CPMTCPFrameWrapper on: mf responseTelegram.
 
 	
 	

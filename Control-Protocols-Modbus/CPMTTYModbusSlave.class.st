@@ -60,11 +60,10 @@ CPMTTYModbusSlave >> serve [
 		bytesRead isEmpty
 		ifFalse: [
 			[	
-				Transcript crShow: '<-',bytesRead asArray asString.
 				transportFrame := self isRTUMode
-											ifTrue:[	(CPMTTYRTUFrameTransformer  
+											ifTrue:[	(CPMTTYRTUFrameWrapper  
 												parseFromStream: (ReadStream  on: bytesRead ) binary)]
-											ifFalse:[(CPMTTYASCIIFrameTransformer  
+											ifFalse:[(CPMTTYASCIIFrameWrapper  
 												parseFromStream: (ReadStream  on: bytesRead ) ascii)].	
 																				
 				modbusFunction := transportFrame modbusFunction.
@@ -72,24 +71,22 @@ CPMTTYModbusSlave >> serve [
 				ifTrue:[
 					modbusFunction executeFunctionOn:self dataTable.		
 					response := self isRTUMode
-											ifTrue:[	(CPMTTYRTUFrameTransformer  on:  modbusFunction responseTelegram)
+											ifTrue:[	(CPMTTYRTUFrameWrapper  on:  modbusFunction responseTelegram)
 															unitID: transportFrame unitID]
-											ifFalse:[(CPMTTYASCIIFrameTransformer  on:  modbusFunction responseTelegram)
+											ifFalse:[(CPMTTYASCIIFrameWrapper  on:  modbusFunction responseTelegram)
 															unitID: transportFrame unitID].
 				]]
 		on: Exception
 		do:[:e| 
 			response:= (e isKindOf: CPMException) 
 				ifTrue:[
-					
-					(CPMTTYRTUFrameTransformer on:  (e 
+					(CPMTTYRTUFrameWrapper on:  (e 
 																	slaveAddress: self unitID ;
 																	responseTelegram)) unitID: self unitID.
 					]
 				ifFalse:[nil]].	
 
 		response ifNotNil:[
-			Transcript crShow: '->', response telegram asArray asString.
 			self serialPort  nextPutAll:response telegram	]]
 		]
 	] 
