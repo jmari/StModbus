@@ -71,20 +71,20 @@ CPMTTYASCIIFrameWrapper >> telegram [
 		nextPutAll:  asciiTelegram;
 		nextPutAll:  self LRC;
 		nextPutAll:  self trailer.
-	^frame
+	^frame contents asByteArray 
 ]
 
 { #category : #private }
 CPMTTYASCIIFrameWrapper >> toASCII: aByteArray [
 	| ws  |
 	ws := WriteStream on:OrderedCollection new.
-	aByteArray do:[:aByte| ws nextPutAll: (aByte bitAnd:2r11111111) printStringHex   ].
-	^ ws contents asArray
+	aByteArray do:[:aByte| ws nextPutAll: (aByte bitAnd:2r11111111) printStringHex asByteArray  ].
+	^ ws contents asByteArray
 
 ]
 
 { #category : #'as yet unclassified' }
 CPMTTYASCIIFrameWrapper >> trailer [
-	^ String crlf
+	^ String crlf asByteArray
  	
 ]

@@ -50,10 +50,11 @@ CPMTTYModbusSlave >> isRunning [
 
 { #category : #lifecycle }
 CPMTTYModbusSlave >> serve [
-	| modbusFunction response  transportFrame |
+	| modbusFunction response  transportFrame d|
 	[
 	|bytesRead |
-
+	d := Delay forMilliseconds:  (self waitingTimeFor: 10).
+	
 	self connectTo: port.
 	[ stop ] whileFalse:[	
 		bytesRead :=  self readByteArray.
@@ -85,8 +86,9 @@ CPMTTYModbusSlave >> serve [
 																	responseTelegram)) unitID: self unitID.
 					]
 				ifFalse:[nil]].	
-
+		
 		response ifNotNil:[
+			d wait.
 			self serialPort  nextPutAll:response telegram	]]
 		]
 	] 
