@@ -4,6 +4,13 @@ Class {
 	#category : #'Control-Protocols-Modbus-Functions'
 }
 
+{ #category : #private }
+CPMReadExceptionStatusFunction class >> newFromStream:aStream [ 
+	"for convenience, all the modbus function classes are instantiate by newFromStream: 
+	 but CPMReadExceptionStatusFunction and CPMReportSlaveIDFunction"
+	^ self new
+]
+
 { #category : #'as yet unclassified' }
 CPMReadExceptionStatusFunction >> executeFunctionOn: dataTable [
 	[self data: dataTable exceptionStatus]

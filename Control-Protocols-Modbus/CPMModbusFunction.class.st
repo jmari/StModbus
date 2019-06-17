@@ -27,23 +27,35 @@ CPMModbusFunction class >> maskWriteRegisterFunctionCode [
 	^ 16r16
 ]
 
+{ #category : #parsing }
+CPMModbusFunction class >> modbusFunctionClassDictionary [
+	^ {  
+		self forceMultipleCoilFunctionCode  -> CPMForceMultipleCoilsFunction.
+		self presetMultipleRegisterFunctionCode -> CPMPresetMultipleRegistersFunction.
+		self readCoilFunctionCode   -> CPMReadCoilStatusFunction.
+		self readExceptionStatusFunctionCode  -> CPMReadExceptionStatusFunction.
+		self readHoldingRegisterFunctionCode  -> CPMReadHoldingRegistersFunction .
+		self readInputRegisterFunctionCode  -> CPMReadInputRegistersFunction.
+
+	 	self readInputStatusFunctionCode   -> CPMReadInputStatusFunction.
+		self reportSlaveIDFunctionCode   ->  CPMReportSlaveIDFunction.
+		self forceSingleCoilFunctionCode  -> CPMForceSingleCoilFunction.
+		self presetSingleRegisterFunctionCode -> CPMPresetSingleRegistersFunction. 
+		self readWriteRegisterFunctionCode -> CPMReadWriteRegistersFunction.
+		self maskWriteRegisterFunctionCode -> CPMMaskWriteRegisterFunction.
+	} asDictionary
+]
+
 { #category : #private }
 CPMModbusFunction class >> newFromStream: aStream [
+	"aStream should contain HA, LA, NH, NL, BC, DATA"
 	| bc instance|
 	instance := self new.
 	instance startingAddressHigh: aStream next low: aStream next.
 	instance numberOfElementsHigh:  aStream next low: aStream next.
+	"we don't use BC but size of data"
 	bc := aStream next.
 	instance data: aStream upToEnd.
-	^  instance
-]
-
-{ #category : #private }
-CPMModbusFunction class >> newResponseFromStream: aStream [
-	| bc instance|
-	instance := self new.
-	bc := aStream next.
-	instance data: (aStream next:bc).
 	^  instance
 ]
 
@@ -52,22 +64,9 @@ CPMModbusFunction class >> parseFromStream:aStream [
 	| i f instance|
 	i := aStream next.
 	f := aStream next.
-
-	(f = self forceMultipleCoilFunctionCode  ) ifTrue:[ instance:= CPMForceMultipleCoilsFunction newFromStream:aStream  ].
-	(f = self presetMultipleRegisterFunctionCode) ifTrue:[ instance:= CPMPresetMultipleRegistersFunction newFromStream:aStream ].
-	(f = self readCoilFunctionCode   ) ifTrue:[ instance:= CPMReadCoilStatusFunction newFromStream:aStream  ].
-	(f = self readExceptionStatusFunctionCode  ) ifTrue:[ instance:= CPMReadExceptionStatusFunction  new ].
-	(f = self readHoldingRegisterFunctionCode  ) ifTrue:[ instance:= CPMReadHoldingRegistersFunction newFromStream:aStream  ].
-	(f = self readInputRegisterFunctionCode  ) ifTrue:[ instance:= CPMReadInputRegistersFunction newFromStream:aStream  ].
-
-	(f = self readInputStatusFunctionCode   ) ifTrue:[ instance:= CPMReadInputStatusFunction newFromStream:aStream  ].
-	(f = self reportSlaveIDFunctionCode   ) ifTrue:[ instance := CPMReportSlaveIDFunction new ].
-	(f = self forceSingleCoilFunctionCode  ) ifTrue:[ instance:= CPMForceSingleCoilFunction newFromStream:aStream ].
-	(f = self presetSingleRegisterFunctionCode ) ifTrue:[ instance:= CPMPresetSingleRegistersFunction newFromStream:aStream  
-].
-	(f = self readWriteRegisterFunctionCode ) ifTrue:[ instance:= CPMReadWriteRegistersFunction  newFromStream:aStream  ].
-	(f = self maskWriteRegisterFunctionCode ) ifTrue:[ instance:= CPMMaskWriteRegisterFunction newFromStream:aStream  ].
-
+	
+	instance := (self modbusFunctionClassDictionary at: f)  newFromStream:aStream . 
+	
 	instance ifNil:[ CPMIlegalFunctionException new 
 									queryFunctionCode: (f ifNil:[0]);
 									slaveAddress: i;

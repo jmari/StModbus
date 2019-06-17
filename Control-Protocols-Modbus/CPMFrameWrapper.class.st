@@ -25,22 +25,25 @@ CPMFrameWrapper class >> parseFromStream: aStream [
 
 { #category : #accessing }
 CPMFrameWrapper >> modbusFunction [
-
+	"Modbus function is assigned in parsing the Stream from the network"
 	^ modbusFunction
 ]
 
 { #category : #accessing }
 CPMFrameWrapper >> modbusFunction: aModbusFunctionObject [
+	"Modbus function is assigned in parsing the Stream from the network"
 	modbusFunction := aModbusFunctionObject
 ]
 
 { #category : #accessing }
 CPMFrameWrapper >> modbusTelegram [
+	"Modbus telegram should be assigned with fodbus function #responseTelegram after the execution of the function"
 	^ modbusTelegram
 ]
 
 { #category : #accessing }
 CPMFrameWrapper >> modbusTelegram: aModbusFunctionTelegram [
+	"Modbus telegram should be assigned with fodbus function #responseTelegram after the execution of the function"
 	modbusTelegram := aModbusFunctionTelegram
 ]
 

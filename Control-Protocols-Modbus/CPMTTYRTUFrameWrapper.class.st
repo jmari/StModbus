@@ -45,7 +45,7 @@ CPMTTYRTUFrameWrapper >> header [
 { #category : #'as yet unclassified' }
 CPMTTYRTUFrameWrapper >> telegram [
 
-	frame ifNil:[ frame := ReadWriteStream on: OrderedCollection new].
+	frame := ReadWriteStream on: OrderedCollection new.
 	frame 
 		nextPutAll:  self modbusTelegram;
 		nextPutAll:  self CRC.

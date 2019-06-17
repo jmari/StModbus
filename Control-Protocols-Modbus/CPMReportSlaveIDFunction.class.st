@@ -5,8 +5,10 @@ Class {
 }
 
 { #category : #'as yet unclassified' }
-CPMReportSlaveIDFunction class >> newFromStream [
-	self shouldBeImplemented
+CPMReportSlaveIDFunction class >> newFromStream:aStream [ 
+	"for convenience, all the modbus function classes are instantiate by newFromStream: 
+	 but CPMReadExceptionStatusFunction and CPMReportSlaveIDFunction"
+	^ self new
 ]
 
 { #category : #'as yet unclassified' }

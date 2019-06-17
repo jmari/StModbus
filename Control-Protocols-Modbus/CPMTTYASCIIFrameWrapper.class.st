@@ -63,7 +63,7 @@ CPMTTYASCIIFrameWrapper >> header [
 { #category : #'as yet unclassified' }
 CPMTTYASCIIFrameWrapper >> telegram [
 	| asciiTelegram |
-	frame ifNil:[ frame := ReadWriteStream on: OrderedCollection new].
+	frame := ReadWriteStream on: OrderedCollection new.
 	asciiTelegram := self toASCII: self modbusTelegram contents.
 
 	frame 

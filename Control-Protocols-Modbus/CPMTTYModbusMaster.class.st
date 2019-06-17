@@ -43,17 +43,16 @@ CPMTTYModbusMaster >> send [
 												unitID: currentFunction slaveAddress; 
 												telegram]).
 	"read response"		
-	
+	d wait.
 	(bA:= self readByteArray) isEmpty 
 		ifFalse:[	
 			response := self isRTUMode 
 					ifTrue:[
 						CPMTTYRTUFrameWrapper 
-								parseFromStream: (ReadStream on:bA)]
+								parseFromStream: (ReadStream on:bA) binary]
 					ifFalse:[
 						CPMTTYASCIIFrameWrapper 
-								parseFromStream: (ReadStream on:bA)].
-			d wait.
+								parseFromStream: (ReadStream on:bA) ascii].
 			^ currentFunction updateFromResponseStream: (ReadStream on: response modbusFunction responseTelegram)].
 		^ nil 
 ]
