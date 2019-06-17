@@ -76,9 +76,13 @@ CPMTTYASCIIFrameWrapper >> telegram [
 
 { #category : #private }
 CPMTTYASCIIFrameWrapper >> toASCII: aByteArray [
-	| ws  |
+	| ws  hexString |
 	ws := WriteStream on:OrderedCollection new.
-	aByteArray do:[:aByte| ws nextPutAll: (aByte bitAnd:2r11111111) printStringHex asByteArray  ].
+	aByteArray do:[:aByte| 
+		hexString :=(aByte bitAnd:2r11111111) printStringHex.
+		ws nextPutAll: (hexString size = 2 
+											ifTrue:[hexString asByteArray  ]
+											ifFalse: [ ('0', hexString)  asByteArray ])].
 	^ ws contents asByteArray
 
 ]

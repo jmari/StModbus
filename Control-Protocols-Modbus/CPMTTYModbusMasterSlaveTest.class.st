@@ -60,9 +60,12 @@ CPMTTYModbusMasterSlaveTest class >> test [
 
 { #category : #tests }
 CPMTTYModbusMasterSlaveTest >> testASCIIParse [
-	|frameTransformer|
- 	frameTransformer := CPMTTYASCIIFrameWrapper parseFromStream: (ReadStream on:#(58 48 49 48 51 48 48 48 48 48 48 48 65 70 50 13 10)).
-
+	|frameWrapper memoryTable f |
+ 	frameWrapper := CPMTTYASCIIFrameWrapper parseFromStream: (ReadStream on:#[58 48 49 48 51 48 48 48 48 48 48 48 65 70 50 13 10]).
+	memoryTable := CPMModbusDataTable new.
+	f := frameWrapper modbusFunction executeFunctionOn: memoryTable.
+	self assert: (CPMTTYASCIIFrameWrapper on:f responseTelegram ) telegram  
+		  equals: #[58 48 49 48 51 49 52 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 48 69 56 13 10]
 ]
 
 { #category : #tests }
@@ -105,7 +108,7 @@ CPMTTYModbusMasterSlaveTest >> testForceSingleCoil [
 { #category : #tests }
 CPMTTYModbusMasterSlaveTest >> testLRC [
 
- self assert:(CPMTTYASCIIFrameWrapper new LRC: #(17 3 0 107 0 3)) equals: #($7 $E) .
+ self assert:(CPMTTYASCIIFrameWrapper new LRC: #[17 3 0 107 0 3]) equals: #[55 69] .
 ]
 
 { #category : #tests }
