@@ -5,19 +5,22 @@ Class {
 		'emptyArray',
 		'serialPort',
 		'port',
-		'rtuMode'
+		'rtuMode',
+		'wrapperClass'
 	],
 	#category : #'Control-Protocols-Modbus-Main'
 }
 
 { #category : #modes }
 CPMTTYModbusFactory >> ASCIIMode [
-	rtuMode := false
+	rtuMode := false.
+	wrapperClass := CPMTTYASCIIFrameWrapper
 ]
 
 { #category : #modes }
 CPMTTYModbusFactory >> RTUMode [
-	rtuMode := true
+	rtuMode := true.
+	wrapperClass := CPMTTYRTUFrameWrapper
 ]
 
 { #category : #'connection open/close' }
@@ -29,7 +32,7 @@ CPMTTYModbusFactory >> connectTo:aPort [
 { #category : #initialization }
 CPMTTYModbusFactory >> initialize [ 
 	super initialize.
-	rtuMode :=true.
+	self RTUMode.
 	emptyArray := Array new
 ]
 

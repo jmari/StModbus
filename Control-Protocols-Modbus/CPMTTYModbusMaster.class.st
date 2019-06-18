@@ -32,27 +32,14 @@ CPMTTYModbusMaster >> send [
 	| response bA d |
 	"send query"
 	d := Delay forMilliseconds:  (self waitingTimeFor: 3.5).
-	self serialPort nextPutAll:
-		(self isRTUMode 
-			ifTrue:[
-				(CPMTTYRTUFrameWrapper on: currentFunction queryTelegram ) 
+	self serialPort nextPutAll: ((wrapperClass on: currentFunction queryTelegram ) 
 												unitID: currentFunction slaveAddress; 
-												telegram]
-			ifFalse:[
-				(CPMTTYASCIIFrameWrapper on: currentFunction queryTelegram ) 
-												unitID: currentFunction slaveAddress; 
-												telegram]).
+												telegram).
 	"read response"		
 	d wait.
 	(bA:= self readByteArray) isEmpty 
 		ifFalse:[	
-			response := self isRTUMode 
-					ifTrue:[
-						CPMTTYRTUFrameWrapper 
-								parseFromStream: (ReadStream on:bA) binary]
-					ifFalse:[
-						CPMTTYASCIIFrameWrapper 
-								parseFromStream: (ReadStream on:bA) ascii].
+			response := wrapperClass parseFromStream: (ReadStream on:bA).
 			^ currentFunction updateFromResponseStream: (ReadStream on: response modbusFunction responseTelegram)].
 		^ nil 
 ]

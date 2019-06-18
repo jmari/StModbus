@@ -61,21 +61,13 @@ CPMTTYModbusSlave >> serve [
 		bytesRead isEmpty
 		ifFalse: [
 			[	
-				transportFrame := self isRTUMode
-											ifTrue:[	(CPMTTYRTUFrameWrapper  
-												parseFromStream: (ReadStream  on: bytesRead ) binary)]
-											ifFalse:[(CPMTTYASCIIFrameWrapper  
-												parseFromStream: (ReadStream  on: bytesRead ) ascii)].	
-																				
+				transportFrame := wrapperClass	parseFromStream: (ReadStream  on: bytesRead ).									
 				modbusFunction := transportFrame modbusFunction.
 				modbusFunction slaveAddress = self unitID 
 				ifTrue:[
 					modbusFunction executeFunctionOn:self dataTable.		
-					response := self isRTUMode
-											ifTrue:[	(CPMTTYRTUFrameWrapper  on:  modbusFunction responseTelegram)
-															unitID: transportFrame unitID]
-											ifFalse:[(CPMTTYASCIIFrameWrapper  on:  modbusFunction responseTelegram)
-															unitID: transportFrame unitID].
+					response := (wrapperClass on:  modbusFunction responseTelegram)
+															unitID: transportFrame unitID.
 				]]
 		on: Exception
 		do:[:e| 
