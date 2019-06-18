@@ -73,14 +73,12 @@ CPMTTYModbusSlave >> serve [
 		do:[:e| 
 			response:= (e isKindOf: CPMException) 
 				ifTrue:[
-					(CPMTTYRTUFrameWrapper on:  (e 
-																	slaveAddress: self unitID ;
-																	responseTelegram)) unitID: self unitID.
+					(wrapperClass on:  (e slaveAddress: self unitID ;
+												responseTelegram)) unitID: self unitID.
 					]
 				ifFalse:[nil]].	
 		
 		response ifNotNil:[
-			d wait.
 			self serialPort  nextPutAll:response telegram	]]
 		]
 	] 

@@ -56,8 +56,9 @@ CPMTTYModbusFactory >> readByteArray [
    | buffer nRead started bytesRead timeout2 |
 
 	buffer := ByteArray new: 256.
-	timeout := self waitingTimeFor:10. "waiting time should be  3.5 chars in milliseconds"
+	timeout := self waitingTimeFor: 10. "characters"
 	timeout2 := self waitingTimeFor:10. "waiting time should be  1.5 chars in milliseconds"
+	
 	started := Time millisecondClockValue.
 	bytesRead := 0.
 	[ Time millisecondClockValue - started < timeout]
@@ -67,8 +68,11 @@ CPMTTYModbusFactory >> readByteArray [
             ifFalse: [
 					bytesRead := bytesRead + nRead.
 					started := Time millisecondClockValue.
-					timeout:= timeout2
-   ] ].
+					self isRTUMode  
+						ifTrue:[timeout:= timeout2]
+						ifFalse:[
+							(bytesRead > 1 and:[(buffer copyFrom: (bytesRead -1) to: bytesRead ) = #[13 10]]) 					ifTrue:[timeout:= 0]].
+   				] ].
 	^ bytesRead > 0 ifTrue:[buffer copyFrom: 1 to: bytesRead ] ifFalse:[emptyArray]	 	
 
 ]
