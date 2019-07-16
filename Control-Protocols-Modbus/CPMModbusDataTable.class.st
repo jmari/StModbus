@@ -310,6 +310,11 @@ CPMModbusDataTable >> readInputsStartingAt: anAddress numberOfPoints: twoBytesNu
 ]
 
 { #category : #initalize }
+CPMModbusDataTable >> reset [ 
+	table := nil
+]
+
+{ #category : #initalize }
 CPMModbusDataTable >> separateMemorySpace [
 
 "Output Coils are assigned the block 1-9999

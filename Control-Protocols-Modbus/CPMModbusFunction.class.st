@@ -34,7 +34,7 @@ CPMModbusFunction class >> modbusFunctionClassDictionary [
 		self presetMultipleRegisterFunctionCode -> CPMPresetMultipleRegistersFunction.
 		self readCoilFunctionCode   -> CPMReadCoilStatusFunction.
 		self readExceptionStatusFunctionCode  -> CPMReadExceptionStatusFunction.
-		self readHoldingRegisterFunctionCode  -> CPMReadHoldingRegistersFunction .
+		self readHoldingRegistersFunctionCode  -> CPMReadHoldingRegistersFunction .
 		self readInputRegisterFunctionCode  -> CPMReadInputRegistersFunction.
 
 	 	self readInputStatusFunctionCode   -> CPMReadInputStatusFunction.
@@ -105,7 +105,7 @@ CPMModbusFunction class >> readExceptionStatusFunctionCode [
 ]
 
 { #category : #'function-codes' }
-CPMModbusFunction class >> readHoldingRegisterFunctionCode [
+CPMModbusFunction class >> readHoldingRegistersFunctionCode [
 	^16r03
 ]
 

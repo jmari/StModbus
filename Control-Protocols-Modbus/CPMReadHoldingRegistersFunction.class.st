@@ -25,5 +25,5 @@ CPMReadHoldingRegistersFunction >> executeFunctionOn: dataTable [
 
 { #category : #'as yet unclassified' }
 CPMReadHoldingRegistersFunction >> function [
-	^function ifNil:[function:=self class readHoldingRegisterFunctionCode ]
+	^function ifNil:[function:=self class readHoldingRegistersFunctionCode ]
 ]

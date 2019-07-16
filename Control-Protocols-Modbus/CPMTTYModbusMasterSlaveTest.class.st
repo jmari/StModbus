@@ -26,7 +26,7 @@ CPMTTYModbusMasterSlaveTest class >> exampleOfInitializationMaster [
 		data: #[0 2].
 	ttyMaster send.
 	
-	ttyMaster readHoldingRegister 
+	ttyMaster readHoldingRegisters 
 		slaveAddress:16r1;
 		startingAddress:16r00.
 		
@@ -170,7 +170,7 @@ CPMTTYModbusMasterSlaveTest >> testReadCoilStatus [
 ]
 
 { #category : #tests }
-CPMTTYModbusMasterSlaveTest >> testReadHoldingRegister [
+CPMTTYModbusMasterSlaveTest >> testReadHoldingRegisters [
 	| response checkSum |
 	
 	
@@ -181,7 +181,7 @@ CPMTTYModbusMasterSlaveTest >> testReadHoldingRegister [
 										data: #[0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0 9 0 10]. "array of Bytes"
 	response := self tcpMaster send.		
 	
-	self tcpMaster readHoldingRegister  
+	self tcpMaster readHoldingRegisters  
 										slaveAddress:16r1;
 										startingAddress:16r08.
 	response := self tcpMaster send.
@@ -222,7 +222,7 @@ CPMTTYModbusMasterSlaveTest >> testRemotePresetAndReadHoldingRegister [
 		data: #[0 2].
 	rm send.
 	
-	rm readHoldingRegister 
+	rm readHoldingRegisters 
 		slaveAddress:16r1;
 		startingAddress:16r00.
 		

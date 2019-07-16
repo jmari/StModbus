@@ -61,7 +61,7 @@ CPMModbusFactory >> readExceptionStatus [
 ]
 
 { #category : #functions }
-CPMModbusFactory >> readHoldingRegister [
+CPMModbusFactory >> readHoldingRegisters [
 	^ currentFunction :=   CPMReadHoldingRegistersFunction  new.
 ]
 

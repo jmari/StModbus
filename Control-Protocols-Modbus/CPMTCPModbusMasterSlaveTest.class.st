@@ -50,6 +50,36 @@ CPMTCPModbusMasterSlaveTest >> testForceSingleCoil [
 ]
 
 { #category : #tests }
+CPMTCPModbusMasterSlaveTest >> testIgnoreUnitID [
+	| response checkSum |
+	
+	self tcpMaster  presetMultipleRegisters 
+		slaveAddress:16r2;"different unitid, slave is 1"
+		startingAddress:16r0;
+		numberOfRegisters:10;
+		data: #[0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0 9 0 10]. "array of Bytes"
+	response := self tcpMaster send.	
+								
+	checkSum := 	self tcpSlave dataTable table inject: 0 into:[:chs :aRow| chs + aRow].
+	self assert: checkSum equals: (10 + 9 + 8 + 7 + 6 + 5 + 4 + 3 + 2 + 1).
+	
+	
+	"Now with checkUnitId"
+	self tcpSlave verifyUnitId. 
+	self tcpSlave dataTable reset.
+	self tcpMaster  presetMultipleRegisters 
+		slaveAddress:16r2;"different unitid, slave is 1"
+		startingAddress:16r0;
+		numberOfRegisters:10;
+		data: #[0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0 9 0 10]. "array of Bytes"
+	response := self tcpMaster send.	
+								
+	checkSum := 	self tcpSlave dataTable table inject: 0 into:[:chs :aRow| chs + aRow].
+	self deny: checkSum equals: (10 + 9 + 8 + 7 + 6 + 5 + 4 + 3 + 2 + 1).	
+	self assert: checkSum equals:0				
+]
+
+{ #category : #tests }
 CPMTCPModbusMasterSlaveTest >> testPresetMultipleHoldingRegisters [
 	| response checkSum |
 	
@@ -108,7 +138,7 @@ CPMTCPModbusMasterSlaveTest >> testReadCoilStatus [
 ]
 
 { #category : #tests }
-CPMTCPModbusMasterSlaveTest >> testReadHoldingRegister [
+CPMTCPModbusMasterSlaveTest >> testReadHoldingRegisters [
 	| response checkSum |
 	
 	
@@ -119,7 +149,7 @@ CPMTCPModbusMasterSlaveTest >> testReadHoldingRegister [
 										data: #[0 1 0 2 0 3 0 4 0 5 0 6 0 7 0 8 0 9 0 10]. "array of Bytes"
 	response := self tcpMaster send.		
 	
-	self tcpMaster readHoldingRegister  
+	self tcpMaster readHoldingRegisters  
 										slaveAddress:16r1;
 										startingAddress:16r08.
 	response := self tcpMaster send.
@@ -160,7 +190,7 @@ CPMTCPModbusMasterSlaveTest >> testRemotePresetAndReadHoldingRegister [
 		data: #[0 2].
 	rm send.
 	
-	rm readHoldingRegister 
+	rm readHoldingRegisters 
 		slaveAddress:16r1;
 		startingAddress:16r00.
 		

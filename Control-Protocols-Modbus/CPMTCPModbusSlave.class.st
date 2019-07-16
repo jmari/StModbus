@@ -6,7 +6,8 @@ Class {
 		'connectionPool',
 		'stop',
 		'serverProcess',
-		'port'
+		'port',
+		'ignoreUnitId'
 	],
 	#category : #'Control-Protocols-Modbus-Main'
 }
@@ -51,6 +52,7 @@ CPMTCPModbusSlave >> disconnect [
 CPMTCPModbusSlave >> initialize [
 	super initialize.
 	stop := false.
+	ignoreUnitId := true.
 
 	
 ]
@@ -92,7 +94,6 @@ CPMTCPModbusSlave >> port: aPort [
 CPMTCPModbusSlave >> serve:interactionSocket [
 	| modbusFunction response data frameWrapper |
 	
-	[
 	[ stop ] whileFalse:[	
 		interactionSocket waitForDataIfClosed:[^self].
 		data := interactionSocket  receiveData asByteArray.
@@ -101,7 +102,7 @@ CPMTCPModbusSlave >> serve:interactionSocket [
 							
 			modbusFunction := frameWrapper modbusFunction.
 			
-			(modbusFunction slaveAddress = self unitID )
+			(modbusFunction slaveAddress = self unitID ) | ignoreUnitId 
 				ifTrue:[
 					modbusFunction executeFunctionOn:self dataTable.	
 					"TO-DO. Why do I have to create a new Frame Wrapper insted of using the same"
@@ -114,11 +115,10 @@ CPMTCPModbusSlave >> serve:interactionSocket [
 			response := ((CPMTCPFrameWrapper on:  e responseTelegram)
 								transactionID: (((data at: 1) <<8) bitOr: (data at:2))).
 			"change status register?"].	
-			interactionSocket sendData: response telegram]
-	] 
-	ensure:[interactionSocket closeAndDestroy].	
+		response ifNotNil:[interactionSocket sendData: response telegram]]
 	
-	 
+	
+
 ]
 
 { #category : #accessing }
@@ -138,4 +138,11 @@ CPMTCPModbusSlave >> stop [
 	self disconnect.
 	serverProcess 	ifNotNil:[ serverProcess terminate]. 
 	serverProcess := nil
+]
+
+{ #category : #accessing }
+CPMTCPModbusSlave >> verifyUnitId [
+	"unitID in modbus message shoud be the same than the slave ID to get a response
+	ignored by default"
+	ignoreUnitId := false
 ]
