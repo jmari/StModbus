@@ -53,8 +53,7 @@ CPMTCPModbusMaster >> mutex [
 CPMTCPModbusMaster >> reconnect [
 	self socket isConnected ifFalse:[
 		self socket 
-			connectTo: address port:port;
-			waitForConnectionFor: self timeout.
+			connectTo: address port:port waitForConnectionFor: self timeout.
 	
 		self socket isConnected 
 			ifTrue:[self connectionEstablished]
